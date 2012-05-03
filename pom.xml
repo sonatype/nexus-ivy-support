@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.bosch.nexus</groupId>
+    <artifactId>ivy-support</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>nexus-plugin</packaging>
+    <name>TOOLS_NexusExtensions</name>
+    <description>Support for clean up IVY and different snapshot format</description>
+
+    <properties>
+        <nexus-version>2.0.2</nexus-version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+  
+    <dependencies>
+        
+        <!-- helpful abstract classes 
+        if contributing new kind of Repository, 
+        content type, grouping, or any other repository related component -->
+        <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-proxy</artifactId>
+            <version>${nexus-version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- logger for tests -->
+        <dependency>
+	<groupId>log4j</groupId>
+	<artifactId>log4j</artifactId>
+	<version>1.2.14</version>
+         <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+        
+        <!--to plugin UTs -->
+        <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-plugin-test-api</artifactId>
+            <version>${nexus-version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
+        </dependency>
+      
+      <!-- utility methods to start/stop Nexus, communicate using REST API, automatically deploy files and more -->
+        <dependency>
+            <groupId>org.sonatype.nexus</groupId>
+            <artifactId>nexus-test-harness-launcher</artifactId>
+            <scope>test</scope>
+            <version>${nexus-version}</version>    
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-logging</groupId>
+                    <artifactId>commons-logging</artifactId>
+                </exclusion>
+            </exclusions>
+       </dependency>
+       
+       <!-- matchers are very useful for testing -->
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>1.3.RC2</version>
+            <scope>test</scope>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.sonatype.nexus</groupId>
+                <artifactId>nexus-webapp-dependencies</artifactId>
+                <version>${nexus-version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            
+            <!--create a Maven module with packaging “nexus-plugin”-->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>app-lifecycle-maven-plugin</artifactId>
+                <version>1.6</version>
+                <extensions>true</extensions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.sonatype.plugins</groupId>
+                        <artifactId>app-lifecycle-nexus</artifactId>
+                        <version>1.6</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+            
+            <!-- compile the sources -->
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            
+            <!-- toolkit for measuring and reporting Java code coverage -->
+            <plugin>
+              <groupId>org.sonatype.maven.plugin</groupId>
+              <artifactId>emma-maven-plugin</artifactId>
+              <version>1.1</version>
+              <executions>
+                <execution>
+                 <phase>process-classes</phase>
+                 <goals>
+                 <goal>instrument</goal>
+                 </goals>
+               </execution>
+             </executions>
+           </plugin>
+
+            <!-- Fork Tests because of problems with Sisu-Guice-Version -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.9-SONATYPE</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.maven.surefire</groupId>
+                        <artifactId>surefire-junit47</artifactId>
+                        <version>2.9-SONATYPE</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+            <!-- Plugin for creating a test instance of Nexus -->
+                  <plugin>
+                    <groupId>org.sonatype.nexus.plugins</groupId>
+                    <artifactId>nexus-test-environment-maven-plugin</artifactId>
+                    <version>${nexus-version}</version>
+                    <executions>
+                    <execution>
+                    <goals>
+                    <goal>package</goal>
+                    <goal>setup-nexus-plugin-environment</goal>
+                     </goals>
+                     </execution>
+                     </executions>
+                    <configuration>
+                        <nexusVersion>${nexus-version}</nexusVersion>
+                        <nexusBundleArtifact>
+                            <groupId>org.sonatype.nexus</groupId>
+                            <artifactId>nexus-oss-webapp</artifactId>
+                            <version>2.0.2</version>
+                            <classifier>bundle</classifier>
+                            <type>zip</type>
+                        </nexusBundleArtifact> 
+                    </configuration>
+            </plugin> 
+            
+            <!-- Plugin for copy the resources into test instance -->
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+                <executions>
+                    <execution>
+                        <phase>process-test-resources</phase>
+                        <goals>
+                        <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                        <outputDirectory>${basedir}/target</outputDirectory>
+                        <resources>
+                        <resource>
+                        <directory>${basedir}/src/test/resources</directory>
+                        <filtering>true</filtering>
+                        </resource>
+                        </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+            
+            <!--Plugin to execute the integration tests, failsafe reports for example "TestSuite.txt" -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>failsafe-maven-plugin</artifactId>
+                <version>2.4.3-alpha-2-SONATYPE-11146</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+            </plugin>
+        </plugins>
+        
+    </build>
+
+    <distributionManagement>
+       <repository>
+          <id>tmp_releases</id>
+          <name>Releases Repo on TMP Innovations Waiblingen</name>
+          <url>${url.repo.release}</url>
+       </repository>
+       <snapshotRepository>
+          <id>tmp_snapshots</id>
+          <name>Snapshot Repo on TMP Innovations Waiblingen</name>
+          <url>${url.repo.snapshot}</url>
+       </snapshotRepository>
+    </distributionManagement>
+
+</project>

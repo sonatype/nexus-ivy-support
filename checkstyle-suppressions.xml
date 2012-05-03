@@ -1,0 +1,62 @@
+<?xml version="1.0"?><!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.0//EN" "http://www.puppycrawl.com/dtds/suppressions_1_0.dtd">
+<suppressions>
+
+    <!-- ======================================================================
+	PROJECT SPECIFIC SUPPRESSIONS
+    
+    In this file, you can specify which warning and error from checkstyle are 
+	suppressed. Not all checks are applicable in all cases. During code review,
+	the suppression of a warning/error can be agreed upon.
+    
+    To suppress a check, enter a new configuration block that looks like this:
+    
+    <!- 2008-12-24 lat1si Generated code ->
+    <suppress checks="LineLength" files="MyFile.java"/>
+    
+    This will suppress the check named MyCheckName in the file MyFile.java. The
+	comment must contain the date (YYYY-MM-DD), the developer and a description
+	why it is ok to suppress the check.
+    
+    Most common checks for suppression are:
+    - LineLength
+	- JavadocMethod
+	
+	To specify the files, you can use regular expression. The regular expression
+	will be found at any position inside the full path name. There is no need to
+	specify a leading ".*". 
+	
+	Also note that the path names may contain forward or backward slashes. Hence
+	you must always use "[/\\]" to be platform independent.
+
+	======================================================================= -->
+
+	
+    <!-- ======================================================================
+	PLATFORM
+	======================================================================= -->
+
+	<!-- do not check inside the build subdirectory (needed for Netbeans integration) -->
+	<suppress checks=".*" files="[/\\]build[/\\]"/>
+	<!-- do not check inside the test subdirectory (needed for Netbeans integration) -->
+	<suppress checks=".*" files="[/\\]test[/\\]"/>
+	<!-- 
+        IGNORE 'AvoidInlineConditionals':
+        * inline conditionals basically serve a useful purpose and make simple assignments easier (and shorter) to write
+        * NetBeans even uses conditional assignments in code generated for equals() and hashCode() methods which we 
+          do not want to be forced to change manually
+    -->
+    <suppress checks="AvoidInlineConditionals" files=".*"/>
+
+    <!-- 
+        IGNORE 'IllegalType' for some classes: 
+        The parameter classes are generated from the Task service description which contains some abstract
+        type definitions resulting in abstract classes to show up in the method signatures for the generated
+        port type interface
+    -->
+    <suppress checks="IllegalType" files="TaskUtils.java"/>
+    <suppress checks="IllegalType" files="TaskSearchHandler.java"/>
+    <suppress checks="IllegalType" files="FilterFactory.java"/>
+    <suppress checks="IllegalType" files="DefaultFilterFactory.java"/>
+    <suppress checks="IllegalType" files="RecursiveFilter.java"/> 
+    <suppress checks="IllegalType" files="PayloadBuilder.java"/> 
+</suppressions>

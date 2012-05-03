@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:e="http://ant.apache.org/ivy/extra" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+	
+    <info organisation="com.bosch.tmp" module="auth-api" revision="0.8-2" status="integration" publication="20120217154953"/>
+    
+    <configurations defaultconfmapping="*->default">
+        <conf description="The JARs to be packaged in the build artifact." name="package"/>
+       	<conf description="The JARs provided by the runtime (JDK, Container)." name="provided"/>
+    	<conf description="For compiling and running the test cases!" name="test"/>
+        <conf description="Aspects that need to be woven into the project." name="aspect"/>
+        <conf description="contains only the artifact published by this module itself, with no transitive dependencies" name="master" visibility="public"/>
+    </configurations>
+   
+    <publications>
+        <artifact conf="master" type="pom"/>
+        <artifact conf="master" type="jar"/>
+        <artifact conf="master" e:classifier="sources" ext="jar" type="source"/>
+    </publications>
+    
+    <dependencies>
+
+		<dependency conf="provided" org="org.apache.ant" name="ant-commons-logging" rev="1.7.1" transitive="false"/>
+        <dependency conf="provided" org="org.apache.ant" name="ant" rev="1.7.1" transitive="false"/>
+        <dependency conf="provided" org="freemarker" name="freemarker" rev="2.3.9"/>
+        <dependency conf="test" org="junit" name="junit" rev="4.4" transitive="false"/>        
+        
+		<!-- Global excludes for all dependencies -->
+        <exclude module="commons-logging" org="commons-logging"/>
+
+    </dependencies>
+	                   
+</ivy-module>
